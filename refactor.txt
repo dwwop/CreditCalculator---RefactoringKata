@@ -1,0 +1,7 @@
+Magicke konstanty pre typy companies
+
+Vypocet credit limit cez else if a nie cez samostatny calculator a factory
+
+Odobrat validacie na customera do samostatnych metod
+
+Prerozdelit CustomerCreditService a validaciu nan do samostatneho subora
