@@ -1,13 +1,15 @@
-﻿namespace CreditCalculator.After;
+﻿using CreditCalculator.After.Model;
+
+namespace CreditCalculator.After;
 
 public class CompanyRepository
 {
-    private readonly List<Company> _companies = new()
-    {
+    private readonly List<Company> _companies =
+    [
         Company.RegularClient,
         Company.ImportantClient,
         Company.VeryImportantClient
-    };
+    ];
 
     public Company GetById(int companyId)
     {

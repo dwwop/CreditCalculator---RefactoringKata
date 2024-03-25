@@ -1,7 +1,13 @@
-﻿namespace CreditCalculator.After;
+﻿using CreditCalculator.After.CreditSetter;
+using CreditCalculator.After.Model;
+
+namespace CreditCalculator.After;
 
 public class CustomerService
 {
+    private readonly CompanyRepository _companyRepository = new();
+    private readonly CustomerRepository _customerRepository = new();
+
     public bool AddCustomer(
         string firstName,
         string lastName,
@@ -9,32 +15,13 @@ public class CustomerService
         DateTime dateOfBirth,
         int companyId)
     {
-        if (string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName))
-        {
-            return false;
-        }
+        if (!IsNameEmpty(firstName, lastName)) return false;
 
-        if (!email.Contains('@') && !email.Contains('.'))
-        {
-            return false;
-        }
+        if (!IsEmailInvalid(email)) return false;
 
-        var now = DateTime.Now;
-        var age = now.Year - dateOfBirth.Year;
-        if (now.Month < dateOfBirth.Month ||
-            now.Month == dateOfBirth.Month && now.Day < dateOfBirth.Day)
-        {
-            age--;
-        }
+        if (!IsYoungerThan21(dateOfBirth)) return false;
 
-
-        if (age < 21)
-        {
-            return false;
-        }
-
-        var companyRepository = new CompanyRepository();
-        var company = companyRepository.GetById(companyId);
+        var company = _companyRepository.GetById(companyId);
 
         var customer = new Customer
         {
@@ -45,47 +32,47 @@ public class CustomerService
             LastName = lastName
         };
 
-        if (company.Type == "VeryImportantClient")
+        var calculator = CreditCalculatorFactory.Create(company.Type);
+        var creditLimit = calculator.GetCreditLimit(customer);
+
+        if (!IsLimitTooLow(creditLimit)) return false;
+
+        if (creditLimit != null)
         {
-            // Skip credit check
-            customer.HasCreditLimit = false;
-        }
-        else if (company.Type == "ImportantClient")
-        {
-            // Do credit check and double credit limit
             customer.HasCreditLimit = true;
-            var creditService = new CustomerCreditServiceClient();
-
-            var creditLimit = creditService.GetCreditLimit(
-                customer.FirstName,
-                customer.LastName,
-                customer.DateOfBirth);
-
-            creditLimit *= 2;
-            customer.CreditLimit = creditLimit;
-        }
-        else
-        {
-            // Do credit check
-            customer.HasCreditLimit = true;
-            var creditService = new CustomerCreditServiceClient();
-
-            var creditLimit = creditService.GetCreditLimit(
-                customer.FirstName,
-                customer.LastName,
-                customer.DateOfBirth);
-
             customer.CreditLimit = creditLimit;
         }
 
-        if (customer.HasCreditLimit && customer.CreditLimit < 500)
-        {
-            return false;
-        }
-
-        var customerRepository = new CustomerRepository();
-        customerRepository.AddCustomer(customer);
+        _customerRepository.AddCustomer(customer);
 
         return true;
+    }
+
+    private static bool IsLimitTooLow(decimal? creditLimit)
+    {
+        return creditLimit is not < 500;
+    }
+
+    private static bool IsYoungerThan21(DateTime dateOfBirth)
+    {
+        var now = DateTime.Now;
+        var age = now.Year - dateOfBirth.Year;
+
+        if (now.Month < dateOfBirth.Month ||
+            (now.Month == dateOfBirth.Month && now.Day < dateOfBirth.Day))
+            age--;
+
+
+        return age >= 21;
+    }
+
+    private static bool IsEmailInvalid(string email)
+    {
+        return email.Contains('@') || email.Contains('.');
+    }
+
+    private static bool IsNameEmpty(string firstName, string lastName)
+    {
+        return !string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName);
     }
 }

@@ -4,4 +4,6 @@ Vypocet credit limit cez else if a nie cez samostatny calculator a factory
 
 Odobrat validacie na customera do samostatnych metod
 
-Prerozdelit CustomerCreditService a validaciu nan do samostatneho subora
+Utriedenie class do suborov
+
+Odstranenie CustomerCreditServiceClient a presunutie metody do AbstractCreditLimitCalculator
