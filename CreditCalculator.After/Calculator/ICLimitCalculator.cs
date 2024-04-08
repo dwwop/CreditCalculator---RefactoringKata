@@ -1,6 +1,6 @@
 ﻿using CreditCalculator.After.Model;
 
-namespace CreditCalculator.After.CreditSetter;
+namespace CreditCalculator.After.Calculator;
 
 public class ICLimitCalculator : AbstractCreditLimitCalculator
 {

@@ -1,9 +1,9 @@
-using CreditCalculator.Before;
+using CreditCalculator.After;
 using FluentAssertions;
 
 namespace CreditCalculator.Tests;
 
-public class CustomerServiceBeforeTests
+public class CustomerServiceAfterTests
 {
     public const int Regular = 1;
     public const int ImportantClient = 2;

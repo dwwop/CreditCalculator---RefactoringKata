@@ -1,6 +1,7 @@
-﻿using CreditCalculator.After.Model;
+﻿using CreditCalculator.After.Constants;
+using CreditCalculator.After.Model;
 
-namespace CreditCalculator.After.CreditSetter;
+namespace CreditCalculator.After.Calculator;
 
 public abstract class AbstractCreditLimitCalculator
 {
@@ -9,10 +10,10 @@ public abstract class AbstractCreditLimitCalculator
 
     protected static decimal GetCreditLimitValue(string firstName, string lastName, DateTime dateOfBirth)
     {
-        if (firstName == "John" && lastName == "Doe") return 500.0m;
+        if (firstName == "John" && lastName == "Doe") return LimitConstants.LimitJohnDoe;
 
-        if (DateTime.Now.Year - dateOfBirth.Year > 40) return 600.0m;
+        if (DateTime.Now.Year - dateOfBirth.Year > 40) return LimitConstants.LimitPersonYoungerThan40;
 
-        return 249.9m;
+        return LimitConstants.LimitDefault;
     }
 }

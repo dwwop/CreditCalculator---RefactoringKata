@@ -1,4 +1,4 @@
-﻿using CreditCalculator.After.CreditSetter;
+﻿using CreditCalculator.After.Calculator;
 using CreditCalculator.After.Model;
 
 namespace CreditCalculator.After;
@@ -15,11 +15,11 @@ public class CustomerService
         DateTime dateOfBirth,
         int companyId)
     {
-        if (!IsNameEmpty(firstName, lastName)) return false;
+        if (IsNameEmpty(firstName, lastName)) return false;
 
-        if (!IsEmailInvalid(email)) return false;
+        if (IsEmailInvalid(email)) return false;
 
-        if (!IsYoungerThan21(dateOfBirth)) return false;
+        if (IsYoungerThan21(dateOfBirth)) return false;
 
         var company = _companyRepository.GetById(companyId);
 
@@ -35,7 +35,7 @@ public class CustomerService
         var calculator = CreditCalculatorFactory.Create(company.Type);
         var creditLimit = calculator.GetCreditLimit(customer);
 
-        if (!IsLimitTooLow(creditLimit)) return false;
+        if (IsLimitTooLow(creditLimit)) return false;
 
         if (creditLimit != null)
         {
@@ -50,7 +50,7 @@ public class CustomerService
 
     private static bool IsLimitTooLow(decimal? creditLimit)
     {
-        return creditLimit is not < 500;
+        return creditLimit is < 500;
     }
 
     private static bool IsYoungerThan21(DateTime dateOfBirth)
@@ -63,16 +63,16 @@ public class CustomerService
             age--;
 
 
-        return age >= 21;
+        return age < 21;
     }
 
     private static bool IsEmailInvalid(string email)
     {
-        return email.Contains('@') || email.Contains('.');
+        return !email.Contains('@') && !email.Contains('.');
     }
 
     private static bool IsNameEmpty(string firstName, string lastName)
     {
-        return !string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName);
+        return string.IsNullOrEmpty(firstName) || string.IsNullOrEmpty(lastName);
     }
 }
